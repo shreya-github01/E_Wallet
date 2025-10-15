@@ -1,4 +1,4 @@
-# 💸 E-Wallet & Online Payment System  
+# 💸 E-Wallet
 
 A simple yet powerful **E-Wallet** system built using **Java (JDBC)** and **MySQL** for backend and a **modern frontend** using **HTML, CSS & React**.  
 It allows users to create wallets, make virtual fund transfers, and view transaction histories — all in a clean and responsive interface.  
@@ -25,7 +25,7 @@ It allows users to create wallets, make virtual fund transfers, and view transac
 ## 📋 To-Do
 
 ### 🔹 Backend (Java + JDBC + MySQL)
-- [x] Wallet creation & user registration  
+- [ ] Wallet creation & user registration  
 - [ ] Fund transfer logic (virtual transactions)  
 - [ ] Transaction history storage & retrieval  
 - [ ] Implement input validation in backend  
@@ -33,7 +33,7 @@ It allows users to create wallets, make virtual fund transfers, and view transac
 - [ ] Add exception handling for failed transactions  
 
 ### 🔹 Frontend (HTML + CSS + React)
-- [x] Design wallet dashboard UI  
+- [ ] Design wallet dashboard UI  
 - [ ] Display transaction history dynamically  
 - [ ] Improve responsive layout using Flexbox  
 - [ ] Add form validation (React state handling)  
