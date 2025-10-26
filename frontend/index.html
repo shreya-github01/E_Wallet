@@ -1,0 +1,183 @@
+<!-- File: index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple E-Wallet Demo</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar">
+      <div class="nav-logo">E‑Wallet</div>
+      <ul class="nav-links">
+        <li><a href="#create">Create Wallet</a></li>
+        <li><a href="#wallets">Wallets</a></li>
+        <li><a href="#transfer">Transfer</a></li>
+        <li><a href="#history">History</a></li>
+      </ul>
+    </nav>
+    <div class="header-info">
+      <h1>Simple E‑Wallet</h1>
+      <p class="tag">Manage wallets • Transfer virtual funds • View history</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="create" class="card create-wallet">
+      <h2>Create Wallet</h2>
+      <form id="createWalletForm">
+        <label>Wallet Name
+          <input type="text" id="walletName" placeholder="e.g., My Savings" required>
+        </label>
+        <label>Initial Balance
+          <input type="number" id="walletBalance" value="0" min="0" required>
+        </label>
+        <button type="submit" class="btn">Create</button>
+      </form>
+    </section>
+
+    <section id="wallets" class="card wallets">
+      <h2>Your Wallets</h2>
+      <div id="walletList" class="wallet-list">
+        <!-- wallets rendered here -->
+      </div>
+    </section>
+
+    <section id="transfer" class="card transfer">
+      <h2>Transfer Funds</h2>
+      <form id="transferForm">
+        <label>From
+          <select id="fromWallet"></select>
+        </label>
+        <label>To
+          <select id="toWallet"></select>
+        </label>
+        <label>Amount
+          <input type="number" id="transferAmount" min="1" required>
+        </label>
+        <button type="submit" class="btn">Send</button>
+      </form>
+    </section>
+
+    <section id="history" class="card history">
+      <h2>Transaction History</h2>
+      <div id="historyList" class="history-list">
+        <!-- transactions -->
+      </div>
+      <button id="clearHistory" class="link-btn">Clear History</button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>Demo only — client-side. No real money involved.</small>
+  </footer>
+
+  <script>
+    const walletsKey = 'ewallet_demo_wallets';
+    const historyKey = 'ewallet_demo_history';
+    function loadData(key){ return JSON.parse(localStorage.getItem(key) || '[]'); }
+    function saveData(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+    function uid(){ return 'w_' + Math.random().toString(36).slice(2,9); }
+    function renderWallets(){
+      const wallets = loadData(walletsKey);
+      const list = document.getElementById('walletList');
+      const from = document.getElementById('fromWallet');
+      const to = document.getElementById('toWallet');
+      list.innerHTML = '';
+      from.innerHTML = '';
+      to.innerHTML = '';
+      if(wallets.length === 0){
+        list.innerHTML = '<p class="muted">No wallets yet. Create one to get started.</p>';
+        from.innerHTML = '<option value="">-</option>';
+        to.innerHTML = '<option value="">-</option>';
+        return;
+      }
+      wallets.forEach(w => {
+        const card = document.createElement('div');
+        card.className = 'wallet-item';
+        card.innerHTML = `<div class="wallet-name">${escapeHtml(w.name)}</div>
+                          <div class="wallet-balance">₹ ${formatNumber(w.balance)}</div>
+                          <div class="wallet-actions"><button class="small" data-id="${w.id}" onclick="deleteWallet('${w.id}')">Delete</button></div>`;
+        list.appendChild(card);
+        const opt = document.createElement('option'); opt.value = w.id; opt.textContent = w.name + ' (₹' + formatNumber(w.balance) + ')';
+        from.appendChild(opt.cloneNode(true));
+        to.appendChild(opt.cloneNode(true));
+      });
+    }
+    function renderHistory(){
+      const history = loadData(historyKey);
+      const container = document.getElementById('historyList');
+      if(history.length === 0){ container.innerHTML = '<p class="muted">No transactions yet.</p>'; return; }
+      container.innerHTML = '';
+      history.slice().reverse().forEach(tx => {
+        const d = document.createElement('div');
+        d.className = 'tx-item';
+        d.innerHTML = `<div class="tx-row"><strong>${escapeHtml(tx.type)}</strong> — ${escapeHtml(tx.note || '')}</div><div class="tx-meta">${new Date(tx.time).toLocaleString()} • ₹ ${formatNumber(tx.amount)}</div>`;
+        container.appendChild(d);
+      });
+    }
+    function formatNumber(n){ return Number(n).toLocaleString('en-IN', {maximumFractionDigits:2}); }
+    function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    document.getElementById('createWalletForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('walletName').value.trim();
+      const bal = parseFloat(document.getElementById('walletBalance').value) || 0;
+      if(!name) return alert('Enter wallet name');
+      const wallets = loadData(walletsKey);
+      const w = { id: uid(), name, balance: +bal };
+      wallets.push(w);
+      saveData(walletsKey, wallets);
+      addHistory('Wallet created', bal, 'Create: ' + name);
+      document.getElementById('createWalletForm').reset();
+      renderWallets(); renderHistory();
+    });
+    document.getElementById('transferForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const fromId = document.getElementById('fromWallet').value;
+      const toId = document.getElementById('toWallet').value;
+      const amount = parseFloat(document.getElementById('transferAmount').value);
+      if(!fromId || !toId) return alert('Select both wallets');
+      if(fromId === toId) return alert('Choose different wallets');
+      if(!amount || amount <= 0) return alert('Enter amount');
+      const wallets = loadData(walletsKey);
+      const from = wallets.find(w=>w.id===fromId);
+      const to = wallets.find(w=>w.id===toId);
+      if(!from || !to) return alert('Wallets not found');
+      if(from.balance < amount) return alert('Insufficient funds in ' + from.name);
+      from.balance -= amount;
+      to.balance += amount;
+      saveData(walletsKey, wallets);
+      addHistory('Transfer', amount, `${from.name} → ${to.name}`);
+      renderWallets(); renderHistory();
+      document.getElementById('transferForm').reset();
+    });
+    function addHistory(type, amount, note){
+      const history = loadData(historyKey);
+      history.push({ id: uid(), type, amount: +amount, note, time: Date.now() });
+      saveData(historyKey, history);
+    }
+    function deleteWallet(id){
+      if(!confirm('Delete this wallet? This will not delete related history.')) return;
+      let wallets = loadData(walletsKey);
+      wallets = wallets.filter(w=>w.id!==id);
+      saveData(walletsKey, wallets);
+      renderWallets();
+    }
+    document.getElementById('clearHistory').addEventListener('click', () => {
+      if(confirm('Clear all transaction history?')){ localStorage.removeItem(historyKey); renderHistory(); }
+    });
+    window.addEventListener('load', () => {
+      if(loadData(walletsKey).length === 0){
+        saveData(walletsKey, [ {id: uid(), name: 'Main Wallet', balance: 1000}, {id: uid(), name: 'Savings', balance: 5000} ]);
+        saveData(historyKey, []);
+      }
+      renderWallets(); renderHistory();
+    });
+  </script>
+</body>
+</html>
+
+
