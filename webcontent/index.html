@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayFlow - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <span>💳</span>
+            <span>PayFlow</span>
+        </div>
+        <div class="user-info">
+            <div>
+                <div style="font-weight: 600;">Welcome Back!</div>
+                <div style="font-size: 12px; opacity: 0.8;" id="userNameDisplay">Loading...</div>
+            </div>
+            <div class="profile-icon" onclick="toggleProfileSidebar()">👤</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="balance-card">
+        <div class="balance-label">Total Balance</div>
+        <div class="balance-amount" id="balanceDisplay">₹0.00</div>
+        <div class="wallet-id">Wallet ID: ...</div>
+    </div>
+
+    <div class="quick-actions">
+        <button class="action-btn" onclick="openModal('transfer')">
+            <div class="action-icon">💸</div>
+            <div class="action-label">Send Money</div>
+        </button>
+        <button class="action-btn" onclick="openModal('receive')">
+            <div class="action-icon">💰</div>
+            <div class="action-label">Request Money</div>
+        </button>
+        <button class="action-btn" onclick="openModal('addFunds')">
+            <div class="action-icon">➕</div>
+            <div class="action-label">Add Funds</div>
+        </button>
+        <button class="action-btn" onclick="showHistory()">
+            <div class="action-icon">📊</div>
+            <div class="action-label">History</div>
+        </button>
+    </div>
+
+    <div class="section-header">
+        <div class="section-title">Recent Transactions</div>
+        <a href="#" class="view-all" onclick="showHistory(); return false;">View All</a>
+    </div>
+
+    <div class="transaction-list" id="transactionList">
+    </div>
+</div>
+
+<div class="modal" id="transferModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Send Money</div>
+            <button class="close-btn" onclick="closeModal('transfer')">&times;</button>
+        </div>
+        <form onsubmit="handleTransfer(event)">
+            <div class="form-group">
+                <label>Recipient Wallet ID</label>
+                <input type="text" placeholder="Enter wallet ID" required>
+            </div>
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" placeholder="0.00" step="0.01" min="1" required>
+            </div>
+            <div class="form-group">
+                <label>Note (Optional)</label>
+                <input type="text" placeholder="Add a note">
+            </div>
+            <button type="submit" class="submit-btn">Send Money</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="receiveModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Request Money</div>
+            <button class="close-btn" onclick="closeModal('receive')">&times;</button>
+        </div>
+        <form onsubmit="handleRequest(event)">
+            <div class="form-group">
+                <label>From Wallet ID</label>
+                <input type="text" placeholder="Enter wallet ID" required>
+            </div>
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" placeholder="0.00" step="0.01" min="1" required>
+            </div>
+            <div class="form-group">
+                <label>Reason</label>
+                <input type="text" placeholder="Reason for request" required>
+            </div>
+            <button type="submit" class="submit-btn">Send Request</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="addFundsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Add Funds</div>
+            <button class="close-btn" onclick="closeModal('addFunds')">&times;</button>
+        </div>
+        <form onsubmit="handleAddFunds(event)">
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select required>
+                    <option value="">Select method</option>
+                    <option value="upi">UPI</option>
+                    <option value="card">Debit/Credit Card</option>
+                    <option value="netbanking">Net Banking</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" placeholder="0.00" step="0.01" min="1" required>
+            </div>
+            <button type="submit" class="submit-btn">Add Funds</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="profileModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Your Profile</div>
+            <button class="close-btn" onclick="closeModal('profile')">&times;</button>
+        </div>
+        <form id="profileForm" onsubmit="handleProfileUpdate(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="profileName" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="profileEmail" disabled>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="profileMobile" placeholder="Add your mobile no.">
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="profileAddress" placeholder="e.g., Buxar, Bihar">
+            </div>
+            <button type="submit" class="submit-btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<div class="profile-sidebar" id="profileSidebar">
+
+    <div class="sidebar-top-header">
+        <span class="sidebar-title">Settings</span>
+        <button class="close-sidebar-btn" onclick="toggleProfileSidebar()">&times;</button>
+    </div>
+
+    <div class="sidebar-profile-card">
+        <div class="profile-icon-large">👤</div>
+        <h3 id="sidebarUserName">Your Name</h3>
+        <span id="sidebarUserEmail">your.email@example.com</span>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="sidebar-section-title">Payments profile</div>
+        <div class="sidebar-info-item">
+            <span class="info-label">Name</span>
+            <span class="info-value" id="sidebarInfoName"></span>
+        </div>
+        <div class="sidebar-info-item">
+            <span class="info-label">Mobile</span>
+            <span class="info-value" id="sidebarInfoMobile"></span>
+        </div>
+        <div class="sidebar-info-item">
+            <span class="info-label">Address</span>
+            <span class="info-value" id="sidebarInfoAddress"></span>
+        </div>
+        <a href="#" class="sidebar-edit-link" onclick="openProfileModal(); return false;">
+            <span>✏️</span> Edit Profile
+        </a>
+    </div>
+
+    <div class="sidebar-logout-section">
+        <a href="#" onclick="logout(); return false;" class="logout-link">
+            <span>🔴</span> Logout
+        </a>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleProfileSidebar()"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

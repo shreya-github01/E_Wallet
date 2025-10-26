@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayFlow - Secure Login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<div class="container">
+    <div class="left-panel">
+        <div class="logo">
+            <div class="logo-icon">💳</div>
+            <span>PayFlow</span>
+        </div>
+        <h1>Welcome Back to Your Digital Wallet</h1>
+        <p>Manage your finances securely and efficiently with our advanced e-wallet platform.</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <span>Bank-level security encryption</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <span>Instant money transfers</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <span>Real-time transaction tracking</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="login-header">
+            <h2>Login to Your Account</h2>
+            <p>Enter your credentials to access your wallet</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <span class="input-icon">📧</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <span class="input-icon" onclick="togglePassword()">👁️</span>
+                </div>
+            </div>
+
+            <div class="remember-forgot">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn" style="max-width: 100%;">
+                <span>📱</span>
+                <span>Login with Phone Number</span>
+            </button>
+        </div>
+
+        <div class="signup-link">
+            Don't have an account? <a href="signup.html">Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<script src="login.js"></script>
+</body>
+</html>
